@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime?
+  Job         Job[]
+}
+
+model Document {
+  id        Int       @id @default(autoincrement())
+  clientId  Int
+  s3Url     String
+  createdAt DateTime? @default(now())
+  updatedAt DateTime?
+}
+
+model Job {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  clientId    Int
+  title       String?   @default("")
+  category    String?   @default("")
+  description String?   @default("")
+  address     String?   @default("")
+  date        DateTime
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime?
+  Client      Client    @relation(fields: [clientId], references: [id])
+  User        User      @relation(fields: [userId], references: [id])
+
+  @@index([clientId], name: "clientId")
+  @@index([userId], name: "userId")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  username  String    @unique
+  email     String    @unique
+  password  String
+  salt      String
+  role      Int       @default(2)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime?
+  Job       Job[]
+}
